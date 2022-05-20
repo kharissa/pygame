@@ -407,7 +407,7 @@ font_render(PyObject *self, PyObject *args)
     if (PyUnicode_Check(text)) {
         Py_ssize_t _size = -1;
         astring = PyUnicode_AsUTF8AndSize(text, &_size);
-        if (astring == NULL && _size == -1) { /* exception already set */
+        if (astring == NULL) { /* exception already set */
             return NULL;
         }
         if (strlen(astring) != (size_t)_size) {
