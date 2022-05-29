@@ -35,25 +35,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3.0.2
-    - name: Display CI properties
+    - name: Display CI software config
       run: |
-        WD=$(pwd)
         python3 -V
-        echo $WD
+        echo Current working directory: $(pwd)
         clang --version | head -n 1
-    
-    - name: Install dependencies
-      run: |
         grep "^Pkg.Revision =" ${ANDROID_HOME}/ndk-bundle/source.properties
-        sudo apt-get update
-        sudo apt-get install bash wget
 
     - name: pygame-wasm-builder prepare
       run: |
-        cd $GITHUB_WORKSPACE/..
+        cd ..
         git clone https://github.com/pmp-p/python-wasm-plus.git
-        mkdir $GITHUB_WORKSPACE/../python-wasm-plus/src
-        ln -s $(pwd)/pygame $GITHUB_WORKSPACE/../python-wasm-plus/src/pygame-wasm
+        mkdir python-wasm-plus/src
+        ln -s pygame python-wasm-plus/src/pygame-wasm
         cd python-wasm-plus
         bash ./python-wasm-plus.sh
         bash ./buildapp.sh
