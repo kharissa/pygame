@@ -103,7 +103,7 @@ static SDL_Event _pg_last_keydown_event = {0};
 /* these macros are no-op here */
 #define PG_LOCK_EVFILTER_MUTEX
 #define PG_UNLOCK_EVFILTER_MUTEX
-#else /* __EMSCRIPTEN__ defined */
+#else /* not on emscripten */
 
 #define PG_LOCK_EVFILTER_MUTEX                                             \
     if (pg_evfilter_mutex) {                                               \
@@ -128,7 +128,7 @@ static SDL_Event _pg_last_keydown_event = {0};
             PG_EXIT(1);                                                    \
         }                                                                  \
     }
-#endif /* __EMSCRIPTEN__ defined */
+#endif /* not on emscripten */
 
 static Uint32
 _pg_repeat_callback(Uint32 interval, void *param)
