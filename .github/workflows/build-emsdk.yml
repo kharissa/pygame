@@ -1,27 +1,60 @@
 name: build-emsdk
 
-on: [push]
+# Run CI only when a release is created, on changes to main branch, or any PR 
+# to main. Do not run CI on any other branch. Also, skip any non-source changes 
+# from running on CI
+on:
+  release:
+    types: [created]
+  push:
+    branches: main
+    paths-ignore:
+      - 'docs/**'
+      - 'examples/**'
+      - '.gitignore'
+      - '*.rst'
+      - '*.md'
+      - '.github/workflows/*.yml'
+      # re-include current file to not be excluded
+      - '!.github/workflows/build-emsdk.yml'
+
+  pull_request:
+    branches: main
+    paths-ignore:
+      - 'docs/**'
+      - 'examples/**'
+      - '.gitignore'
+      - '*.rst'
+      - '*.md'
+      - '.github/workflows/*.yml'
+      # re-include current file to not be excluded
+      - '!.github/workflows/build-emsdk.yml'
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v3.0.2
+    - name: Display CI properties
+      run: |
+        WD=$(pwd)
+        python3 -V
+        echo $WD
+        clang --version | head -n 1
+    
+    - name: Install dependencies
+      run: |
+        grep "^Pkg.Revision =" ${ANDROID_HOME}/ndk-bundle/source.properties
+        sudo apt-get update
+        sudo apt-get install bash wget
+
     - name: pygame-wasm-builder prepare
       run: |
-            WD=$(pwd)
-            python3 -V
-            echo $WD
-            clang --version | head -n 1
-            echo
-            grep "^Pkg.Revision =" ${ANDROID_HOME}/ndk-bundle/source.properties
-            sudo apt-get update
-            sudo apt-get install bash wget
-            cd $GITHUB_WORKSPACE/..
-            git clone https://github.com/pmp-p/python-wasm-plus.git
-            mkdir $GITHUB_WORKSPACE/../python-wasm-plus/src
-            ln -s $(pwd)/pygame $GITHUB_WORKSPACE/../python-wasm-plus/src/pygame-wasm
-            cd python-wasm-plus
-            bash ./python-wasm-plus.sh
-            bash ./buildapp.sh
+        cd $GITHUB_WORKSPACE/..
+        git clone https://github.com/pmp-p/python-wasm-plus.git
+        mkdir $GITHUB_WORKSPACE/../python-wasm-plus/src
+        ln -s $(pwd)/pygame $GITHUB_WORKSPACE/../python-wasm-plus/src/pygame-wasm
+        cd python-wasm-plus
+        bash ./python-wasm-plus.sh
+        bash ./buildapp.sh
 
